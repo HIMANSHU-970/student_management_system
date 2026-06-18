@@ -1,0 +1,16 @@
+.navbar {
+  background: white;
+  padding: 20px 35px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow:
+    0 3px 15px rgba(0,0,0,0.1);
+}
+
+.profile-box {
+  background: #2563eb;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 30px;
+}

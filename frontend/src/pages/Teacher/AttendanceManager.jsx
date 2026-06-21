@@ -1,47 +1,58 @@
-import { useState } from "react";
-import axios from "axios";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-function AttendanceManager() {
-  const [data, setData] = useState({
-    student_id: "",
-    course_id: "",
-    status: "present",
-  });
+const AttendanceManager = () => {
+  const navigate = useNavigate();
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const assignments = JSON.parse(localStorage.getItem("teacher_assignments") || "{}");
+  
+  const [students] = useState([
+    { id: "S001", name: "Rudransh", subject: "CS-301" },
+    { id: "S002", name: "Himanshu", subject: "CS-303" }
+  ]);
 
-  const submit = async () => {
-    await axios.post(
-      "http://localhost:5002/api/teacher/attendance",
-      data,
-      { withCredentials: true }
-    );
-
-    alert("Attendance Marked");
-  };
+  // Role based filtering logic
+  const myStudents = user.role === 'admin' 
+    ? students 
+    : students.filter(s => (assignments[user.id] || []).includes(s.subject));
 
   return (
-    <div>
-      <h2>📊 Mark Attendance</h2>
+    <div style={{ padding: "40px", backgroundColor: "#f8fafc", minHeight: "100vh" }}>
+      <div style={{ marginBottom: "25px" }}>
+        <h2 style={{ fontSize: "1.75rem", color: "#1e293b" }}>
+          {user.role === 'admin' ? "🏢 Admin Registry" : "👨‍🏫 My Assigned Classes"}
+        </h2>
+      </div>
 
-      <input
-        placeholder="Student ID"
-        onChange={(e) => setData({ ...data, student_id: e.target.value })}
-      />
-
-      <input
-        placeholder="Course ID"
-        onChange={(e) => setData({ ...data, course_id: e.target.value })}
-      />
-
-      <select
-        onChange={(e) => setData({ ...data, status: e.target.value })}
-      >
-        <option value="present">Present</option>
-        <option value="absent">Absent</option>
-      </select>
-
-      <button onClick={submit}>Submit</button>
+      <div style={{ backgroundColor: "white", padding: "24px", borderRadius: "16px", border: "1px solid #e2e8f0" }}>
+        <table style={{ width: "100%", borderCollapse: "separate", borderSpacing: "0 10px" }}>
+          <thead>
+            <tr style={{ color: "#64748b", textTransform: "uppercase", fontSize: "0.8rem" }}>
+              <th style={{ padding: "12px", textAlign: "left" }}>Student Name</th>
+              <th style={{ padding: "12px", textAlign: "left" }}>Subject</th>
+              <th style={{ padding: "12px", textAlign: "right" }}>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {myStudents.map((s) => (
+              <tr key={s.id} style={{ backgroundColor: "#fcfcfd" }}>
+                <td style={{ padding: "15px", fontWeight: "600" }}>{s.name}</td>
+                <td style={{ padding: "15px", color: "#475569" }}>{s.subject}</td>
+                <td style={{ padding: "15px", textAlign: "right" }}>
+                  <button 
+                    onClick={() => navigate(`/${user.role}/attendance/${s.id}`)}
+                    style={{ padding: "8px 16px", backgroundColor: "#2563eb", color: "white", border: "none", borderRadius: "6px", cursor: "pointer" }}
+                  >
+                    Manage
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
-}
+};
 
 export default AttendanceManager;

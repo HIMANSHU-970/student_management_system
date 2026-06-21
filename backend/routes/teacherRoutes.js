@@ -6,7 +6,8 @@ const {
   markAttendance,
   assignCourse,
   addAssignment,
-  getAssignments
+  getAssignments,
+  getMySubjects
 } = require("../controllers/teacherController");
 
 const auth = require("../middleware/authMiddleware");
@@ -21,5 +22,8 @@ router.post("/assign-course", auth, assignCourse);
 // 📝 ASSIGNMENTS
 router.post("/assignment", auth, addAssignment);
 router.get("/assignments", auth, getAssignments);
+
+// 🆕 MY SUBJECTS
+router.get("/my-subjects", auth, getMySubjects);
 
 module.exports = router;

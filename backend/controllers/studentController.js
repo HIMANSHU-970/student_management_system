@@ -62,7 +62,7 @@ const getStudentCourses = async (req, res) => {
     }
 };
 
-// सबसे ज़रूरी: इन सभी नामों को ध्यान से एक्सपोर्ट करें
+
 module.exports = {
     getStudentProfile,
     updateStudentProfile,

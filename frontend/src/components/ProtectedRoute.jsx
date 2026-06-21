@@ -5,19 +5,15 @@ import { AuthContext } from "../context/AuthContext";
 function ProtectedRoute({ children, role }) {
   const { user, loading } = useContext(AuthContext);
 
-  // 🔥 while checking auth state
-  if (loading) {
-    return <h3 style={{ textAlign: "center" }}>Loading...</h3>;
-  }
+  if (loading) return <h3>Authenticating...</h3>;
+  if (!user) return <Navigate to="/" replace />;
 
-  // 🔥 not logged in
-  if (!user) {
-    return <Navigate to="/" />;
-  }
+  const userRole = user.role?.toLowerCase();
+  const requiredRole = role?.toLowerCase();
 
-  // 🔥 role mismatch protection
-  if (role && user.role !== role) {
-    return <Navigate to="/" />;
+  // Role Check
+  if (requiredRole && userRole !== requiredRole) {
+    return <Navigate to={`/${userRole}`} replace />;
   }
 
   return children;

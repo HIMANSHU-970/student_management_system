@@ -6,27 +6,32 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // 🔥 load user from localStorage on refresh
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
-    const token = localStorage.getItem("token");
-
-    if (storedUser && token) {
+    if (storedUser) {
       setUser(JSON.parse(storedUser));
     }
-
     setLoading(false);
   }, []);
 
   const saveUser = (userData) => {
-    setUser(userData);
-    localStorage.setItem("user", JSON.stringify(userData));
+    // Role aur ID ko preserve karein
+    const normalizedUser = { 
+      ...userData, 
+      role: userData.role.toLowerCase(),
+      // Agar teacherId nahi hai, to null ya original ID use karein
+      id: userData.teacherId || userData.id 
+    };
+    setUser(normalizedUser);
+    localStorage.setItem("user", JSON.stringify(normalizedUser));
+    localStorage.setItem("role", normalizedUser.role);
+    localStorage.setItem("userName", normalizedUser.name);
   };
 
   const logout = () => {
     setUser(null);
-    localStorage.removeItem("user");
-    localStorage.removeItem("token");
+    localStorage.clear();
+    window.location.href = "/";
   };
 
   return (

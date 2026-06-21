@@ -1,6 +1,13 @@
 const db = require("../config/db");
+const { Attendance, Assignment, TeacherSubject, Course, User, StudentProfile } = require("../models/index");
 
-// 👨‍🏫 GET ALL STUDENTS
+// 🔒 HELPER: Verify teacher is assigned to this course
+const isTeacherOwnsCourse = async (teacherId, courseId) => {
+  const link = await TeacherSubject.findOne({ where: { teacherId, courseId } });
+  return !!link;
+};
+
+// 👨‍🏫 GET ALL STUDENTS - OLD, untouched
 exports.getStudents = async (req, res) => {
   try {
     const result = await db.query(
@@ -15,29 +22,37 @@ exports.getStudents = async (req, res) => {
   }
 };
 
-// 📊 MARK ATTENDANCE
+// 📊 MARK ATTENDANCE - 🆕 REWRITTEN with Sequelize + ownership check
 exports.markAttendance = async (req, res) => {
   try {
-    const { student_id, course_id, status } = req.body;
+    const teacherId = req.user.id;
+    const { student_id, course_id, status, date } = req.body;
 
     if (!student_id || !course_id || !status) {
       return res.status(400).json({ message: "Missing fields" });
     }
 
-    await db.query(
-      `INSERT INTO attendance (student_id, course_id, status, date)
-       VALUES ($1, $2, $3, NOW())`,
-      [student_id, course_id, status]
-    );
+    // 🔒 SECURITY: Teacher sirf apne assigned subject ki attendance de sakta hai
+    const owns = await isTeacherOwnsCourse(teacherId, course_id);
+    if (!owns) {
+      return res.status(403).json({ message: "You are not assigned to this subject. Cannot mark attendance." });
+    }
 
-    res.json({ message: "Attendance marked successfully" });
+    const attendance = await Attendance.create({
+      studentId: student_id,
+      courseId: course_id,
+      status,
+      date: date || new Date()
+    });
+
+    res.json({ message: "Attendance marked successfully", attendance });
   } catch (err) {
-    console.error(err);
+    console.error("❌ markAttendance Error:", err);
     res.status(500).json({ message: "Server error" });
   }
 };
 
-// 📚 ASSIGN COURSE
+// 📚 ASSIGN COURSE (student ko course se jodna) - OLD, untouched (alag concern hai)
 exports.assignCourse = async (req, res) => {
   try {
     const { student_id, course_id } = req.body;
@@ -68,38 +83,71 @@ exports.assignCourse = async (req, res) => {
   }
 };
 
-// 📝 CREATE ASSIGNMENT
+// 📝 CREATE ASSIGNMENT - 🆕 REWRITTEN with Sequelize + ownership check
 exports.addAssignment = async (req, res) => {
   try {
-    const { title, description, course_id } = req.body;
+    const teacherId = req.user.id;
+    const { title, description, course_id, due_date, file_url } = req.body;
 
-    if (!title || !course_id) {
-      return res.status(400).json({ message: "Missing fields" });
+    if (!title || !course_id || !due_date) {
+      return res.status(400).json({ message: "title, course_id, due_date required" });
     }
 
-    await db.query(
-      `INSERT INTO assignments (title, description, course_id, created_at)
-       VALUES ($1, $2, $3, NOW())`,
-      [title, description || "", course_id]
-    );
+    // 🔒 SECURITY: Teacher sirf apne assigned subject ki assignment de sakta hai
+    const owns = await isTeacherOwnsCourse(teacherId, course_id);
+    if (!owns) {
+      return res.status(403).json({ message: "You are not assigned to this subject. Cannot create assignment." });
+    }
 
-    res.json({ message: "Assignment created successfully" });
+    const assignment = await Assignment.create({
+      teacherId,
+      courseId: course_id,
+      title,
+      description: description || "",
+      dueDate: due_date,
+      fileUrl: file_url || null
+    });
+
+    res.json({ message: "Assignment created successfully", assignment });
   } catch (err) {
-    console.error(err);
+    console.error("❌ addAssignment Error:", err);
     res.status(500).json({ message: "Server error" });
   }
 };
 
-// 📋 GET ASSIGNMENTS
+// 📋 GET ASSIGNMENTS - 🆕 REWRITTEN with Sequelize (apne diye hue assignments)
 exports.getAssignments = async (req, res) => {
   try {
-    const result = await db.query(
-      "SELECT * FROM assignments ORDER BY created_at DESC"
-    );
+    const teacherId = req.user.id;
 
-    res.json(result.rows);
+    const assignments = await Assignment.findAll({
+      where: { teacherId },
+      include: [{ model: Course, as: "course", attributes: ["courseCode", "courseName"] }],
+      order: [["createdAt", "DESC"]]
+    });
+
+    res.json(assignments);
   } catch (err) {
-    console.error(err);
+    console.error("❌ getAssignments Error:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// 🆕 Apne assigned subjects fetch karna
+exports.getMySubjects = async (req, res) => {
+  try {
+    const teacherId = req.user.id;
+
+    const assignments = await TeacherSubject.findAll({
+      where: { teacherId },
+      include: [{ model: Course, as: "course" }]
+    });
+
+    const subjects = assignments.map((a) => a.course);
+
+    res.json(subjects);
+  } catch (err) {
+    console.error("❌ getMySubjects Error:", err);
     res.status(500).json({ message: "Server error" });
   }
 };

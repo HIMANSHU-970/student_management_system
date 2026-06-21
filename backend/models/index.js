@@ -8,6 +8,8 @@ const Assignment = require("./Assignment");
 const Exam = require("./Exam");
 const Notice = require("./Notice");
 const Fee = require("./Fee");
+const Course = require("./Course");
+const TeacherSubject = require("./TeacherSubject");
 
 // ================= ASSOCIATIONS =================
 
@@ -32,6 +34,21 @@ Notice.belongsTo(User, { foreignKey: "createdById" });
 User.hasMany(Fee, { foreignKey: "studentId", onDelete: "CASCADE" });
 Fee.belongsTo(User, { foreignKey: "studentId" });
 
+// TEACHER <-> SUBJECT (COURSE) ASSOCIATIONS
+User.hasMany(TeacherSubject, { foreignKey: "teacherId", onDelete: "CASCADE" });
+TeacherSubject.belongsTo(User, { foreignKey: "teacherId", as: "teacher" });
+
+Course.hasMany(TeacherSubject, { foreignKey: "courseId", onDelete: "CASCADE" });
+TeacherSubject.belongsTo(Course, { foreignKey: "courseId", as: "course" });
+
+// 🆕 ATTENDANCE <-> COURSE
+Course.hasMany(Attendance, { foreignKey: "courseId", onDelete: "CASCADE" });
+Attendance.belongsTo(Course, { foreignKey: "courseId", as: "course" });
+
+// 🆕 ASSIGNMENT <-> COURSE
+Course.hasMany(Assignment, { foreignKey: "courseId", onDelete: "CASCADE" });
+Assignment.belongsTo(Course, { foreignKey: "courseId", as: "course" });
+
 module.exports = {
   sequelize,
   User,
@@ -42,4 +59,6 @@ module.exports = {
   Exam,
   Notice,
   Fee,
+  Course,
+  TeacherSubject,
 };

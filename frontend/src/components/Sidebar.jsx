@@ -5,13 +5,16 @@ const Sidebar = () => {
   const navigate = useNavigate();
   const location = useLocation();
   
-  const role = localStorage.getItem("role") || "admin"; 
+  const role = (localStorage.getItem("role") || "admin").toLowerCase(); 
   const userName = localStorage.getItem("userName") || "Himanshu Kumar";
   const savedAvatar = localStorage.getItem(`${role}_avatar`) || "";
 
   const handleLogout = () => {
+    // FIX: Poora storage clear nahi karna hai, sirf session keys hataiye
+    localStorage.removeItem("token");
     localStorage.removeItem("role");
     localStorage.removeItem("userName");
+    // teacher_registry ko nahi hataya hai taaki data save rahe
     navigate("/");
   };
 
@@ -32,6 +35,12 @@ const Sidebar = () => {
     marginBottom: "4px"
   });
 
+  const categoryHeaderStyle = { 
+    fontSize: "0.65rem", color: "#475569", fontWeight: "800", 
+    letterSpacing: "1px", marginTop: "14px", marginBottom: "6px", paddingLeft: "8px",
+    textTransform: "uppercase" 
+  };
+
   return (
     <div style={{
       width: "280px", height: "100vh", backgroundColor: "#0f172a",
@@ -40,7 +49,7 @@ const Sidebar = () => {
       borderRight: "1px solid #1e293b", zIndex: 100, overflowY: "auto"
     }}>
       
-      {/* BRAND IDENTITY */}
+      {/* BRAND */}
       <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "25px", paddingLeft: "8px" }}>
         <div style={{ backgroundColor: "#2563eb", padding: "8px", borderRadius: "8px", fontSize: "1.2rem" }}>🏰</div>
         <div>
@@ -49,24 +58,18 @@ const Sidebar = () => {
         </div>
       </div>
 
-      {/* PROFILE CARD */}
+      {/* PROFILE */}
       <div style={{ backgroundColor: "#1e293b", padding: "12px", borderRadius: "10px", marginBottom: "20px", display: "flex", alignItems: "center", gap: "10px" }}>
-        {savedAvatar ? (
-          <img src={savedAvatar} alt="Profile" style={{ width: "38px", height: "38px", borderRadius: "50%", objectFit: "cover" }} />
-        ) : (
-          <div style={{ width: "38px", height: "38px", borderRadius: "50%", backgroundColor: "#3b82f6", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: "800", fontSize: "0.9rem" }}>
-            {userName.charAt(0)}
-          </div>
-        )}
+        <div style={{ width: "38px", height: "38px", borderRadius: "50%", backgroundColor: "#3b82f6", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: "800", fontSize: "0.9rem" }}>
+          {userName.charAt(0).toUpperCase()}
+        </div>
         <div>
           <div style={{ fontSize: "0.85rem", fontWeight: "700", color: "#e2e8f0" }}>{userName}</div>
-          <div style={{ fontSize: "0.7rem", color: "#10b981", textTransform: "uppercase", fontWeight: "800" }}>{role} Control Node</div>
+          <div style={{ fontSize: "0.7rem", color: "#10b981", textTransform: "uppercase", fontWeight: "800" }}>{role} Node</div>
         </div>
       </div>
 
-      // ... (upari code waisa hi rahega)
-
-      {/* NAVIGATION CONTROLS */}
+      {/* NAVIGATION */}
       <nav style={{ display: "flex", flexDirection: "column", flex: 1 }}>
         {role === "admin" && (
           <>
@@ -77,6 +80,7 @@ const Sidebar = () => {
             <Link to="/admin/subjects" style={linkStyle("/admin/subjects")}>📚 Subject Management</Link>
             <Link to="/admin/timetable" style={linkStyle("/admin/timetable")}>📅 Time Table Scheduler</Link>
             <Link to="/admin/attendance" style={linkStyle("/admin/attendance")}>📊 Attendance Controls</Link>
+            <Link to="/admin/assign-teacher" style={linkStyle("/admin/assign-teacher")}>👨‍🏫 Assign Teachers</Link>
             <Link to="/admin/fees" style={linkStyle("/admin/fees")}>💳 Fee Management</Link>
             
             <div style={categoryHeaderStyle}>ACADEMIC INTEGRATIONS</div>
@@ -96,6 +100,9 @@ const Sidebar = () => {
             <Link to="/teacher" style={linkStyle("/teacher")}>🖥️ Teacher Dashboard</Link>
             <Link to="/teacher/timetable" style={linkStyle("/teacher/timetable")}>🕒 View Time Table</Link>
             <Link to="/teacher/attendance" style={linkStyle("/teacher/attendance")}>📊 Mark Attendance</Link>
+            <Link to="/teacher/assignments" style={linkStyle("/teacher/assignments")}>📂 Assignment Manager</Link>
+            <Link to="/teacher/quizzes" style={linkStyle("/teacher/quizzes")}>📝 Quiz Manager</Link>
+            <Link to="/teacher/notices" style={linkStyle("/teacher/notices")}>📢 Notice Board</Link>
           </>
         )}
 
@@ -108,10 +115,10 @@ const Sidebar = () => {
             <Link to="/student/quizzes" style={linkStyle("/student/quizzes")}>📝 Take Quiz</Link>
             <Link to="/student/assignments" style={linkStyle("/student/assignments")}>📂 Submit Assignments</Link>
             <Link to="/student/fees" style={linkStyle("/student/fees")}>💳 Fees & Invoices</Link>
+            <Link to="/student/notices" style={linkStyle("/student/notices")}>📢 Notices</Link>
           </>
         )}
       </nav>
-
 
       <div style={{ paddingTop: "15px", borderTop: "1px solid #1e293b" }}>
         <button onClick={handleLogout} style={{
@@ -125,7 +132,5 @@ const Sidebar = () => {
     </div>
   );
 };
-
-const categoryHeaderStyle = { fontSize: "0.65rem", color: "#475569", fontWeight: "800", letterSpacing: "1px", marginTop: "14px", marginBottom: "6px", paddingLeft: "8px" };
 
 export default Sidebar;

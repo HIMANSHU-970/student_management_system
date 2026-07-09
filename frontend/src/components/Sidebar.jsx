@@ -10,11 +10,11 @@ const Sidebar = () => {
   const savedAvatar = localStorage.getItem(`${role}_avatar`) || "";
 
   const handleLogout = () => {
-    // FIX: Poora storage clear nahi karna hai, sirf session keys hataiye
+    // FIX: Sirf session keys hatao, koi bhi business/registry data nahi
     localStorage.removeItem("token");
     localStorage.removeItem("role");
     localStorage.removeItem("userName");
-    // teacher_registry ko nahi hataya hai taaki data save rahe
+    localStorage.removeItem("user"); // 🆕 AuthContext isi key se user load karta hai
     navigate("/");
   };
 
@@ -77,20 +77,27 @@ const Sidebar = () => {
             <Link to="/admin" style={linkStyle("/admin")}>🛡️ Workspace Dashboard</Link>
             
             <div style={categoryHeaderStyle}>MANAGEMENT ENGINES</div>
+            <Link to="/admin/departments" style={linkStyle("/admin/departments")}>🏢 Department Management</Link>
+            <Link to="/admin/classes" style={linkStyle("/admin/classes")}>🏫 Class / Section Management</Link>
             <Link to="/admin/subjects" style={linkStyle("/admin/subjects")}>📚 Subject Management</Link>
             <Link to="/admin/timetable" style={linkStyle("/admin/timetable")}>📅 Time Table Scheduler</Link>
             <Link to="/admin/attendance" style={linkStyle("/admin/attendance")}>📊 Attendance Controls</Link>
             <Link to="/admin/assign-teacher" style={linkStyle("/admin/assign-teacher")}>👨‍🏫 Assign Teachers</Link>
             <Link to="/admin/fees" style={linkStyle("/admin/fees")}>💳 Fee Management</Link>
-            
+
+                    
             <div style={categoryHeaderStyle}>ACADEMIC INTEGRATIONS</div>
             <Link to="/admin/quizzes" style={linkStyle("/admin/quizzes")}>📝 Quiz Manager</Link>
             <Link to="/admin/assignments" style={linkStyle("/admin/assignments")}>📂 Assignments Hub</Link>
             <Link to="/admin/broadcasts" style={linkStyle("/admin/broadcasts")}>📢 Central Broadcasts</Link>
+            <Link to="/admin/exams-manage" style={linkStyle("/admin/exams-manage")}>🧪 Exam Management</Link>
 
             <div style={categoryHeaderStyle}>REGISTRY & AUDITS</div>
             <Link to="/admin/students" style={linkStyle("/admin/students")}>🧑‍🎓 Student Registry</Link>
             <Link to="/admin/ledger-override" style={linkStyle("/admin/ledger-override")}>⚙️ Granular Ledger Override</Link>
+            <Link to="/admin/leave" style={linkStyle("/admin/leave")}>📥 Leave Management</Link>
+            <Link to="/admin/messages" style={linkStyle("/admin/messages")}>💬 Messages</Link>
+
           </>
         )}
 
@@ -103,21 +110,30 @@ const Sidebar = () => {
             <Link to="/teacher/assignments" style={linkStyle("/teacher/assignments")}>📂 Assignment Manager</Link>
             <Link to="/teacher/quizzes" style={linkStyle("/teacher/quizzes")}>📝 Quiz Manager</Link>
             <Link to="/teacher/notices" style={linkStyle("/teacher/notices")}>📢 Notice Board</Link>
+            <Link to="/teacher/materials" style={linkStyle("/teacher/materials")}>📖 Study Materials</Link>
+            <Link to="/teacher/exams" style={linkStyle("/teacher/exams")}>🧪 Exam Marks</Link>
+            <Link to="/teacher/messages" style={linkStyle("/teacher/messages")}>💬 Messages</Link>
           </>
         )}
 
         {role === "student" && (
-          <>
-            <div style={categoryHeaderStyle}>STUDENT HUB</div>
-            <Link to="/student" style={linkStyle("/student")}>🖥️ Dashboard</Link>
-            <Link to="/student/attendance" style={linkStyle("/student/attendance")}>📊 Attendance</Link>
-            <Link to="/student/timetable" style={linkStyle("/student/timetable")}>🕒 Class Schedule</Link>
-            <Link to="/student/quizzes" style={linkStyle("/student/quizzes")}>📝 Take Quiz</Link>
-            <Link to="/student/assignments" style={linkStyle("/student/assignments")}>📂 Submit Assignments</Link>
-            <Link to="/student/fees" style={linkStyle("/student/fees")}>💳 Fees & Invoices</Link>
-            <Link to="/student/notices" style={linkStyle("/student/notices")}>📢 Notices</Link>
-          </>
-        )}
+  <>
+    <div style={categoryHeaderStyle}>STUDENT HUB</div>
+    <Link to="/student" style={linkStyle("/student")}>🖥️ Dashboard</Link>
+    <Link to="/student/attendance" style={linkStyle("/student/attendance")}>📊 Attendance</Link>
+    <Link to="/student/timetable" style={linkStyle("/student/timetable")}>🕒 Class Schedule</Link>
+    <Link to="/student/materials" style={linkStyle("/student/materials")}>📖 Study Materials</Link>
+    <Link to="/student/quizzes" style={linkStyle("/student/quizzes")}>📝 Take Quiz</Link>
+    <Link to="/student/assignments" style={linkStyle("/student/assignments")}>📂 Submit Assignments</Link>
+    <Link to="/student/fees" style={linkStyle("/student/fees")}>💳 Fees & Invoices</Link>
+    <Link to="/student/notices" style={linkStyle("/student/notices")}>📢 Notices</Link>
+    <Link to="/student/exams" style={linkStyle("/student/exams")}>🧪 Exams</Link>
+    <Link to="/student/results" style={linkStyle("/student/results")}>🏆 Results</Link>
+    <Link to="/student/leave" style={linkStyle("/student/leave")}>📥 Leave Application</Link>
+    <Link to="/student/messages" style={linkStyle("/student/messages")}>💬 Messages</Link>
+
+  </>
+)}
       </nav>
 
       <div style={{ paddingTop: "15px", borderTop: "1px solid #1e293b" }}>

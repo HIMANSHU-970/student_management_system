@@ -1,42 +1,60 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
+import { AuthContext } from "../../context/AuthContext";
+import { getStudentAttendanceOverview, updateAttendanceOverride } from "../../services/adminService";
+import { getStudentAttendanceForMyCourses, updateMyCourseAttendance } from "../../services/teacherService";
 
 const StudentDetail = () => {
   const { studentId } = useParams();
   const navigate = useNavigate();
-  const user = JSON.parse(localStorage.getItem("user") || "{}");
-  const assignments = JSON.parse(localStorage.getItem("teacher_assignments") || "{}");
+  const { user } = useContext(AuthContext);
 
-  const [attendanceData, setAttendanceData] = useState(() => {
-    const saved = localStorage.getItem(`attendance_${studentId}`);
-    return saved ? JSON.parse(saved) : [
-      { code: "CS-301", module: "Database Management Systems", attended: 21, total: 24 },
-      { code: "CS-302", module: "Design & Analysis of Algorithms", attended: 18, total: 24 },
-      { code: "CS-303", module: "Full-Stack Web Development", attended: 19, total: 20 },
-    ];
-  });
+  const [attendanceData, setAttendanceData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  const canEdit = (subjectCode) => {
-    if (user.role === 'admin') return true;
-    return assignments[user.id]?.includes(subjectCode);
-  };
+  const isAdmin = user?.role === "admin";
 
-  const handleAttendanceChange = (code, newValue) => {
-    if (!canEdit(code)) {
-      alert("Access Denied: You are not authorized to edit this subject.");
-      return;
+  const loadData = async () => {
+    try {
+      const res = isAdmin
+        ? await getStudentAttendanceOverview(studentId)
+        : await getStudentAttendanceForMyCourses(studentId);
+      setAttendanceData(res.data || []);
+    } catch (err) {
+      console.error("Load attendance error:", err);
+      setError(err.response?.data?.message || "Failed to load attendance");
+    } finally {
+      setLoading(false);
     }
-    const updated = attendanceData.map(item => 
-      item.code === code ? { ...item, attended: Number(newValue) } : item
-    );
-    setAttendanceData(updated);
   };
 
-  const handleSave = () => {
-    localStorage.setItem(`attendance_${studentId}`, JSON.stringify(attendanceData));
-    alert("Record Saved Successfully!");
+  useEffect(() => {
+    loadData();
+  }, [studentId]);
+
+  const handleAttendanceChange = (id, newValue) => {
+    setAttendanceData(prev =>
+      prev.map(item => item.id === id ? { ...item, present: Number(newValue) } : item)
+    );
+  };
+
+  const handleSave = async () => {
+    try {
+      await Promise.all(
+        attendanceData.map(item =>
+          isAdmin
+            ? updateAttendanceOverride(item.id, { present: item.present, total: item.total })
+            : updateMyCourseAttendance(item.id, { present: item.present, total: item.total })
+        )
+      );
+      alert("Record Saved Successfully!");
+      loadData();
+    } catch (err) {
+      alert(err.response?.data?.message || "Failed to save changes");
+    }
   };
 
   // PDF Export Logic
@@ -48,10 +66,10 @@ const StudentDetail = () => {
     doc.text(`Generated on: ${new Date().toLocaleString()}`, 14, 28);
 
     const tableData = attendanceData.map(item => [
-      item.code,
-      item.module,
-      `${item.attended}/${item.total}`,
-      `${((item.attended / item.total) * 100).toFixed(1)}%`
+      item.course?.courseCode,
+      item.course?.courseName,
+      `${item.present}/${item.total}`,
+      item.total > 0 ? `${((item.present / item.total) * 100).toFixed(1)}%` : "0%"
     ]);
 
     doc.autoTable({
@@ -63,43 +81,56 @@ const StudentDetail = () => {
     doc.save(`Attendance_${studentId}.pdf`);
   };
 
+  if (loading) return <div style={{ padding: "40px" }}>Loading...</div>;
+
   return (
     <div style={{ padding: "40px", backgroundColor: "#f8fafc", minHeight: "100vh" }}>
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "20px" }}>
         <button onClick={() => navigate(-1)} style={{ padding: "8px 16px", cursor: "pointer", borderRadius: "6px", border: "1px solid #cbd5e1" }}>⬅ Back</button>
         <button onClick={exportPDF} style={{ backgroundColor: "#10b981", color: "white", padding: "8px 16px", borderRadius: "6px", border: "none", cursor: "pointer", fontWeight: "600" }}>📥 Download PDF Report</button>
       </div>
-      
+
       <div style={{ backgroundColor: "white", padding: "30px", borderRadius: "12px", boxShadow: "0 1px 3px rgba(0,0,0,0.1)" }}>
-        <h2 style={{ marginBottom: "20px", color: "#0f172a" }}>Edit Attendance: {studentId}</h2>
-        <table style={{ width: "100%", borderCollapse: "collapse" }}>
-          <thead>
-            <tr style={{ borderBottom: "2px solid #e2e8f0", color: "#64748b" }}>
-              <th style={{ padding: "12px", textAlign: "left" }}>Module</th>
-              <th style={{ padding: "12px", textAlign: "center" }}>Attendance</th>
-            </tr>
-          </thead>
-          <tbody>
-            {attendanceData.map((item) => (
-              <tr key={item.code} style={{ borderBottom: "1px solid #f1f5f9" }}>
-                <td style={{ padding: "12px" }}>{item.module} ({item.code})</td>
-                <td style={{ padding: "12px", textAlign: "center" }}>
-                  <input 
-                    type="number" value={item.attended} disabled={!canEdit(item.code)}
-                    onChange={(e) => handleAttendanceChange(item.code, e.target.value)}
-                    style={{ width: "60px", padding: "5px", textAlign: "center", border: "1px solid #cbd5e1", borderRadius: "4px" }}
-                  /> / {item.total}
-                </td>
+        <h2 style={{ marginBottom: "20px", color: "#0f172a" }}>Attendance: {studentId}</h2>
+
+        {error && <p style={{ color: "#991b1b", fontWeight: "bold" }}>{error}</p>}
+
+        {!error && attendanceData.length === 0 && (
+          <p style={{ color: "#64748b" }}>Ye student kisi subject mein enroll nahi hai (ya aapko assign nahi hai).</p>
+        )}
+
+        {attendanceData.length > 0 && (
+          <table style={{ width: "100%", borderCollapse: "collapse" }}>
+            <thead>
+              <tr style={{ borderBottom: "2px solid #e2e8f0", color: "#64748b" }}>
+                <th style={{ padding: "12px", textAlign: "left" }}>Module</th>
+                <th style={{ padding: "12px", textAlign: "center" }}>Attendance</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-        
-        <div style={{ marginTop: "20px", textAlign: "right" }}>
-          <button onClick={handleSave} style={{ backgroundColor: "#2563eb", color: "white", border: "none", padding: "10px 24px", borderRadius: "6px", cursor: "pointer", fontWeight: "600" }}>
-            Save All Changes
-          </button>
-        </div>
+            </thead>
+            <tbody>
+              {attendanceData.map((item) => (
+                <tr key={item.id} style={{ borderBottom: "1px solid #f1f5f9" }}>
+                  <td style={{ padding: "12px" }}>{item.course?.courseName} ({item.course?.courseCode})</td>
+                  <td style={{ padding: "12px", textAlign: "center" }}>
+                    <input
+                      type="number" value={item.present}
+                      onChange={(e) => handleAttendanceChange(item.id, e.target.value)}
+                      style={{ width: "60px", padding: "5px", textAlign: "center", border: "1px solid #cbd5e1", borderRadius: "4px" }}
+                    /> / {item.total}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+
+        {attendanceData.length > 0 && (
+          <div style={{ marginTop: "20px", textAlign: "right" }}>
+            <button onClick={handleSave} style={{ backgroundColor: "#2563eb", color: "white", border: "none", padding: "10px 24px", borderRadius: "6px", cursor: "pointer", fontWeight: "600" }}>
+              Save All Changes
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

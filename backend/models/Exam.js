@@ -3,8 +3,9 @@ const { sequelize } = require('../config/db');
 
 const Exam = sequelize.define('Exam', {
     id: { type: DataTypes.UUID, defaultValue: DataTypes.UUIDV4, primaryKey: true },
-    examName: { type: DataTypes.STRING, allowNull: false }, 
-    marksObtained: { type: DataTypes.FLOAT, allowNull: false },
+    examName: { type: DataTypes.STRING, allowNull: false }, // e.g. "Mid-Term Exam"
+    courseId: { type: DataTypes.UUID, allowNull: false },
+    examDate: { type: DataTypes.DATEONLY, allowNull: false },
     maxMarks: { type: DataTypes.FLOAT, defaultValue: 100 }
 });
 

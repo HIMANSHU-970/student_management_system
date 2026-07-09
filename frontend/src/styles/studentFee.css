@@ -1,0 +1,376 @@
+/* studentFee.css - Student Portal Styles */
+
+/* Page Layout */
+.student-fee-page {
+  padding: 24px;
+  background: #f8fafc;
+  min-height: 100vh;
+}
+
+.student-fee-loading {
+  padding: 40px;
+  text-align: center;
+  color: #64748b;
+  font-size: 16px;
+}
+
+/* Header */
+.student-fee-header {
+  margin-bottom: 30px;
+}
+
+.student-fee-header h1 {
+  font-size: 2rem;
+  color: #0f172a;
+  font-weight: 800;
+  margin: 0;
+}
+
+.student-fee-header p {
+  color: #64748b;
+  margin: 5px 0 0 0;
+}
+
+/* Error */
+.student-fee-error {
+  background: #fee2e2;
+  color: #991b1b;
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  font-weight: 500;
+}
+
+/* Summary Cards */
+.student-fee-summary {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.summary-card {
+  background: white;
+  padding: 16px 20px;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.summary-card .summary-label {
+  font-size: 13px;
+  color: #94a3b8;
+}
+
+.summary-card .summary-value {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.summary-card.paid .summary-value {
+  color: #10b981;
+}
+
+.summary-card.pending .summary-value {
+  color: #ef4444;
+}
+
+/* Table Wrap */
+.student-fee-table-wrap {
+  background: white;
+  padding: 30px;
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.student-fee-table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.student-fee-table-header h3 {
+  margin: 0;
+  color: #0f172a;
+  font-size: 1.25rem;
+  font-weight: 800;
+}
+
+.fee-count {
+  font-size: 14px;
+  color: #94a3b8;
+  background: #f1f5f9;
+  padding: 4px 12px;
+  border-radius: 20px;
+}
+
+/* Empty State */
+.student-fee-empty {
+  text-align: center;
+  padding: 40px 0;
+  color: #94a3b8;
+}
+
+.empty-icon {
+  font-size: 48px;
+  margin-bottom: 12px;
+}
+
+.student-fee-empty p {
+  font-size: 16px;
+  margin: 0;
+}
+
+.student-fee-empty .empty-sub {
+  font-size: 14px;
+  margin: 5px 0 0 0;
+}
+
+.refresh-btn {
+  margin-top: 16px;
+  padding: 8px 20px;
+  background: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+
+.refresh-btn:hover {
+  background: #2563eb;
+}
+
+/* Fee List - New Design */
+.student-fee-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.fee-item {
+  background: #f8fafc;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  overflow: hidden;
+  transition: all 0.2s;
+}
+
+.fee-item:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+/* Fee Item Header */
+.fee-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  background: white;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.fee-term {
+  margin: 0;
+  color: #1e293b;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.fee-status-badge {
+  padding: 4px 14px;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 0.75rem;
+  min-width: 70px;
+  text-align: center;
+  color: white;
+}
+
+/* Fee Item Body */
+.fee-item-body {
+  padding: 16px 20px;
+}
+
+.fee-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.fee-detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.fee-detail-label {
+  font-size: 12px;
+  color: #94a3b8;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.fee-detail-value {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.fee-detail-value.total {
+  color: #1e293b;
+}
+
+.fee-detail-value.paid {
+  color: #10b981;
+}
+
+.fee-detail-value.pending {
+  color: #ef4444;
+}
+
+/* Fee Item Footer */
+.fee-item-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 12px;
+  border-top: 1px solid #e2e8f0;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.fee-due-date {
+  font-size: 13px;
+  color: #94a3b8;
+}
+
+.fee-paid-badge {
+  font-size: 13px;
+  color: #10b981;
+  font-weight: 600;
+}
+
+/* Mini Progress Bar */
+.fee-progress-mini {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.fee-progress-mini-bar {
+  width: 100px;
+  height: 6px;
+  background: #e2e8f0;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.fee-progress-mini-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.5s ease;
+}
+
+.fee-progress-mini-text {
+  font-size: 12px;
+  color: #64748b;
+  font-weight: 500;
+}
+
+/* Main Progress */
+.student-fee-progress {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.progress-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.progress-header span {
+  font-size: 14px;
+  color: #64748b;
+}
+
+.progress-header span:last-child {
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 10px;
+  background: #e2e8f0;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: 5px;
+  transition: width 0.5s ease;
+}
+
+.progress-stats {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+  font-size: 13px;
+  color: #94a3b8;
+}
+
+.progress-stats span:first-child {
+  color: #10b981;
+}
+
+.progress-stats span:last-child {
+  color: #ef4444;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .student-fee-summary {
+    grid-template-columns: 1fr;
+  }
+  
+  .student-fee-table-wrap {
+    padding: 16px;
+  }
+  
+  .fee-detail-grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  
+  .fee-item-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .fee-item-footer {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .fee-progress-mini {
+    width: 100%;
+  }
+  
+  .fee-progress-mini-bar {
+    flex: 1;
+  }
+}

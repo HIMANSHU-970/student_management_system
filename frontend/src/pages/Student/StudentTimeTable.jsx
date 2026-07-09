@@ -1,23 +1,36 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { studentService } from "../../services/studentService";
 
 const StudentTimeTable = () => {
-  // Safe parsing: agar data na ho toh khali array return karega
-  const getTimetable = () => {
-    try {
-      const data = localStorage.getItem("global_timetable");
-      return data ? JSON.parse(data) : [];
-    } catch (e) {
-      return [];
-    }
-  };
+  const [timetable, setTimetable] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  const timetable = getTimetable();
+  useEffect(() => {
+    const fetchTimetable = async () => {
+      try {
+        const data = await studentService.getTimetable();
+        setTimetable(data || []);
+      } catch (err) {
+        console.error("Fetch timetable error:", err);
+        setError(err.response?.data?.message || "Failed to load timetable");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchTimetable();
+  }, []);
+
+  if (loading) return <div>Loading...</div>;
 
   return (
     <div style={{ padding: "20px", background: "#f8fafc", minHeight: "100vh" }}>
       <h2>🕒 Class Schedule</h2>
-      {timetable.length === 0 ? (
-        <p>No schedule uploaded by Admin yet.</p>
+
+      {error && <p style={{ color: "#991b1b", fontWeight: "bold" }}>{error}</p>}
+
+      {!error && timetable.length === 0 ? (
+        <p>Aapke enrolled subjects ka schedule abhi admin ne nahi banaya.</p>
       ) : (
         <table style={{ width: "100%", borderCollapse: "collapse", marginTop: "20px", background: "white" }}>
           <thead>
@@ -29,12 +42,12 @@ const StudentTimeTable = () => {
             </tr>
           </thead>
           <tbody>
-            {timetable.map((s, idx) => (
-              <tr key={idx} style={{ textAlign: "center" }}>
+            {timetable.map((s) => (
+              <tr key={s.id} style={{ textAlign: "center" }}>
                 <td style={{ padding: "12px", border: "1px solid #ddd" }}>{s.day}</td>
                 <td style={{ padding: "12px", border: "1px solid #ddd" }}>{s.time}</td>
-                <td style={{ padding: "12px", border: "1px solid #ddd" }}>{s.subject}</td>
-                <td style={{ padding: "12px", border: "1px solid #ddd" }}>{s.teacher}</td>
+                <td style={{ padding: "12px", border: "1px solid #ddd" }}>{s.course?.courseCode} - {s.course?.courseName}</td>
+                <td style={{ padding: "12px", border: "1px solid #ddd" }}>{s.teacher?.name}</td>
               </tr>
             ))}
           </tbody>

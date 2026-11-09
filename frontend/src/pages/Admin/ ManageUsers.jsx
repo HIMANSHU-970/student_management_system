@@ -6,14 +6,14 @@ function ManageUsers() {
 
   useEffect(() => {
     axios
-      .get("http://localhost:5002/api/admin/users", {
+      .get(`${import.meta.env.VITE_API_URL || "http://localhost:5002"}/api/admin/users`, {
         withCredentials: true,
       })
       .then((res) => setUsers(res.data));
   }, []);
 
   const deleteUser = async (id) => {
-    await axios.delete(`http://localhost:5002/api/admin/user/${id}`, {
+    await axios.delete(`${import.meta.env.VITE_API_URL || "http://localhost:5002"}/api/admin/user/${id}`, {
       withCredentials: true,
     });
 

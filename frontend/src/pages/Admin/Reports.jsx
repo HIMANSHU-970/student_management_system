@@ -11,7 +11,7 @@ function Reports() {
     const fetchStats = async () => {
       try {
         const res = await axios.get(
-          "http://localhost:5002/api/admin/stats",
+          `${import.meta.env.VITE_API_URL || "http://localhost:5002"}/api/admin/stats`,
           { withCredentials: true }
         );
 

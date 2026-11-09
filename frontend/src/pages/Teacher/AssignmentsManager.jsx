@@ -13,7 +13,7 @@ function AssignmentsManager() {
   // 📥 FETCH ASSIGNMENTS
   useEffect(() => {
     axios
-      .get("http://localhost:5002/api/teacher/assignments", {
+      .get(`${import.meta.env.VITE_API_URL || "http://localhost:5002"}/api/teacher/assignments`, {
         withCredentials: true,
       })
       .then((res) => setAssignments(res.data));
@@ -22,7 +22,7 @@ function AssignmentsManager() {
   // ➕ CREATE ASSIGNMENT
   const createAssignment = async () => {
     await axios.post(
-      "http://localhost:5002/api/teacher/assignment",
+      `${import.meta.env.VITE_API_URL || "http://localhost:5002"}/api/teacher/assignment`,
       form,
       { withCredentials: true }
     );

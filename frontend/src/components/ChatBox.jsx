@@ -4,7 +4,7 @@ import { AuthContext } from "../context/AuthContext";
 import { getContacts, getConversation, sendMessage } from "../services/messageService";
 import "../styles/chat.css";
 
-const socket = io("http://localhost:5002");
+const socket = io(`${import.meta.env.VITE_API_URL || "http://localhost:5002"}`);
 
 const ChatBox = () => {
   const { user } = useContext(AuthContext);

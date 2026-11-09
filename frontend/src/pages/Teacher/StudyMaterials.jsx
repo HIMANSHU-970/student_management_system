@@ -95,7 +95,7 @@ const StudyMaterials = () => {
           <div key={m.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px", borderBottom: "1px solid #f1f5f9" }}>
             <div>
               <b>{m.title}</b> ({m.type}) — {m.course?.courseCode}
-              <a href={`http://localhost:5002${m.fileUrl}`} target="_blank" rel="noreferrer" style={{ marginLeft: "10px", color: "#2563eb" }}>View</a>
+              <a href={`${import.meta.env.VITE_API_URL || "http://localhost:5002"}${m.fileUrl}`} target="_blank" rel="noreferrer" style={{ marginLeft: "10px", color: "#2563eb" }}>View</a>
             </div>
             <button onClick={() => handleDelete(m.id)} style={{ background: "#fee2e2", color: "#ef4444", border: "none", padding: "6px 12px", borderRadius: "4px", cursor: "pointer" }}>Delete</button>
           </div>

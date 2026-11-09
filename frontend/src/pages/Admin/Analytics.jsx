@@ -7,13 +7,13 @@ function Analytics() {
   const [users, setUsers] = useState([]);
 
   useEffect(() => {
-    axios.get("http://localhost:5002/api/analytics/attendance", { withCredentials: true })
+    axios.get(`${import.meta.env.VITE_API_URL || "http://localhost:5002"}/api/analytics/attendance`, { withCredentials: true })
       .then(res => setAttendance(res.data));
 
-    axios.get("http://localhost:5002/api/analytics/courses", { withCredentials: true })
+    axios.get(`${import.meta.env.VITE_API_URL || "http://localhost:5002"}/api/analytics/courses`, { withCredentials: true })
       .then(res => setCourses(res.data));
 
-    axios.get("http://localhost:5002/api/analytics/users", { withCredentials: true })
+    axios.get(`${import.meta.env.VITE_API_URL || "http://localhost:5002"}/api/analytics/users`, { withCredentials: true })
       .then(res => setUsers(res.data));
   }, []);
 

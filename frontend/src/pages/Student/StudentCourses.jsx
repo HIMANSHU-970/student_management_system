@@ -47,7 +47,7 @@ const StudentCourses = () => {
             <div style={{ fontSize: "1.6rem" }}>{typeIcon(m.type)}</div>
             <h4 style={{ margin: "8px 0 4px 0", color: "#0f172a" }}>{m.title}</h4>
             <p style={{ margin: "0 0 12px 0", fontSize: "0.8rem", color: "#64748b" }}>{m.course?.courseCode} - {m.course?.courseName}</p>
-            <a href={`http://localhost:5002${m.fileUrl}`} target="_blank" rel="noreferrer" style={{ color: "#2563eb", fontWeight: "600", fontSize: "0.85rem" }}>
+            <a href={`${import.meta.env.VITE_API_URL || "http://localhost:5002"}${m.fileUrl}`} target="_blank" rel="noreferrer" style={{ color: "#2563eb", fontWeight: "600", fontSize: "0.85rem" }}>
               Download / View →
             </a>
           </div>

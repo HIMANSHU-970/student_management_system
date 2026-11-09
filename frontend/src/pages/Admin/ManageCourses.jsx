@@ -16,7 +16,7 @@ function ManageCourses() {
   const fetchCourses = async () => {
     try {
       const res = await axios.get(
-        "http://localhost:5002/api/admin/courses",
+        `${import.meta.env.VITE_API_URL || "http://localhost:5002"}/api/admin/courses`,
         { withCredentials: true }
       );
 
@@ -29,7 +29,7 @@ function ManageCourses() {
   const addCourse = async () => {
     try {
       await axios.post(
-        "http://localhost:5002/api/admin/course",
+        `${import.meta.env.VITE_API_URL || "http://localhost:5002"}/api/admin/course`,
         form,
         { withCredentials: true }
       );

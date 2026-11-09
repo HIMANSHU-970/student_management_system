@@ -1,3 +1,4 @@
+
 const { Sequelize } = require("sequelize");
 require("dotenv").config();
 
@@ -7,12 +8,21 @@ const sequelize = new Sequelize(
   process.env.DB_PASSWORD,
   {
     host: process.env.DB_HOST,
+    port: process.env.DB_PORT || 5432,
     dialect: "postgres",
     logging: false,
+
+    // Neon PostgreSQL SSL configuration
+    dialectOptions: {
+      ssl: {
+        require: true,
+        rejectUnauthorized: false,
+      },
+    },
   }
 );
 
-// 🔥 TEST CONNECTION
+// TEST DATABASE CONNECTION
 sequelize.authenticate()
   .then(() => {
     console.log("✅ PostgreSQL connected successfully");
@@ -21,5 +31,4 @@ sequelize.authenticate()
     console.log("❌ PostgreSQL connection failed:", err);
   });
 
-// ⚡ इसे बदलकर ऑब्जेक्ट बना दीजिए ताकि { sequelize } वाला इम्पोर्ट काम कर जाए
 module.exports = { sequelize };
